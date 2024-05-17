@@ -79,7 +79,31 @@ const loginUsuario = async (req, res = response) => {
     }
 };
 
+const renewToken = async (req, res = response) => {
+    
+    const uid = req.uid;
+
+    try {
+        const usuario = await Usuario.findById(uid);
+
+        const token = await generarJWT(usuario.id);
+
+        res.json({
+            ok: true,
+            usuario,
+            token
+        });    
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el Administrador'
+        });
+    }    
+}
+
 module.exports = {
     crearUsuario,
-    loginUsuario
+    loginUsuario,
+    renewToken
 }
