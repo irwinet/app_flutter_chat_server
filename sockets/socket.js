@@ -1,6 +1,6 @@
 const { comprobarJWT } = require('../helpers/jwt');
 const { io } = require('../index');
-const { usuarioConectado, usuarioDesconectado } = require('../controllers/socket');
+const { usuarioConectado, usuarioDesconectado, grabarMensaje } = require('../controllers/socket');
 
 // Mensajes de Sockets
 io.on('connection', (client) => {
@@ -15,6 +15,22 @@ io.on('connection', (client) => {
     }
 
     usuarioConectado(uid);
+
+    // Ingresar al usuario a una sala en particular
+    // sala global, client.id, 664682a562690224a6c8a7bf
+    client.join(uid);
+
+    // client.to(uid).emit('');
+
+    // Escuchar el cliente el mensaje-personal
+    client.on('mensaje-personal', async (payload) => {
+        console.log(payload);
+
+        // Grabar mensaje
+        await grabarMensaje(payload);
+
+        io.to(payload.para).emit('mensaje-personal', payload);
+    });
 
     client.on('disconnect', () => {
         console.log('Cliente desconectado');
